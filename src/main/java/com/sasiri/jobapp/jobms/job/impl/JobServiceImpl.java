@@ -23,10 +23,12 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private JobRepository jobRepository;
 
+    @Autowired
+    RestTemplate restTemplate;
+
     @Override
     public List<JobWithCompanyDTO> findAll() {
         List<Job> jobs = jobRepository.findAll();
-        List<JobWithCompanyDTO> jobWithCompanyDTOS = new ArrayList<>();
 
         return jobs.stream().map(this::convertToDto).collect(Collectors.toList());
 
@@ -35,10 +37,9 @@ public class JobServiceImpl implements JobService {
     private JobWithCompanyDTO convertToDto(Job job) {
         JobWithCompanyDTO jobWithCompanyDTO = new JobWithCompanyDTO();
         jobWithCompanyDTO.setJob(job);
-        RestTemplate restTemplate = new RestTemplate();
 
         Company company = restTemplate.
-                getForObject("http://localhost:8081/companies/" + job.getCompanyId(),
+                getForObject("http://companyms:8081/companies/" + job.getCompanyId(),
                         Company.class);
 
         jobWithCompanyDTO.setCompany(company);
