@@ -6,6 +6,7 @@ import com.sasiri.jobapp.jobms.job.JobRepository;
 import com.sasiri.jobapp.jobms.job.JobService;
 import com.sasiri.jobapp.jobms.job.dto.JobWithCompanyDTO;
 import com.sasiri.jobapp.jobms.job.external.Company;
+import com.sasiri.jobapp.jobms.job.mapper.JobMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
@@ -35,12 +36,11 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobWithCompanyDTO convertToDto(Job job) {
-        JobWithCompanyDTO jobWithCompanyDTO = new JobWithCompanyDTO();
-        jobWithCompanyDTO.setJob(job);
-
         Company company = restTemplate.
                 getForObject("http://companyms:8081/companies/" + job.getCompanyId(),
                         Company.class);
+
+        JobWithCompanyDTO jobWithCompanyDTO = JobMapper.toJobWithCompanyDTO(job, company);
 
         jobWithCompanyDTO.setCompany(company);
 
@@ -53,8 +53,10 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job findById(Long id) {
-         return jobRepository.findById(id).orElse(null);
+    public JobWithCompanyDTO findById(Long id) {
+        Job job = jobRepository.findById(id).orElse(null);
+        return convertToDto(job);
+
     }
 
     @Override
@@ -62,7 +64,7 @@ public class JobServiceImpl implements JobService {
         try {
             jobRepository.deleteById(id);
             return true;
-        }catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -70,7 +72,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public boolean updateJob(Long id, Job updatedJob) {
         Optional<Job> jobOptional = jobRepository.findById(id);
-        if(jobOptional.isPresent()) {
+        if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
             job.setTitle(updatedJob.getTitle());
             job.setDescription(updatedJob.getDescription());

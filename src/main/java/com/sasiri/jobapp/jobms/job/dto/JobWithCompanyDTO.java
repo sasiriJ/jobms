@@ -9,6 +9,11 @@ import lombok.Data;
 @Data
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 public class JobWithCompanyDTO {
-    Job job;
+    Long id;
+    String title;
+    String description;
+    String minSalary;
+    String maxSalary;
+    String location;
     Company company;
 }
