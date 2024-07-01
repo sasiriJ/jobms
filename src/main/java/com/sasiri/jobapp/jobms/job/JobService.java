@@ -1,13 +1,13 @@
 package com.sasiri.jobapp.jobms.job;
 
-import com.sasiri.jobapp.jobms.job.dto.JobWithCompanyDTO;
+import com.sasiri.jobapp.jobms.job.dto.JobDTO;
 
 import java.util.List;
 
 public interface JobService {
-    List<JobWithCompanyDTO> findAll();
+    List<JobDTO> findAll();
     void createJob(Job job);
-    JobWithCompanyDTO findById(Long id);
+    JobDTO findById(Long id);
     boolean deleteById(Long id);
     boolean updateJob(Long id, Job job);
 }
