@@ -11,6 +11,7 @@ import com.sasiri.jobapp.jobms.job.external.Company;
 import com.sasiri.jobapp.jobms.job.external.Review;
 import com.sasiri.jobapp.jobms.job.mapper.JobMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -41,7 +42,9 @@ public class JobServiceImpl implements JobService {
     private ReviewClient reviewClient;
 
     @Override
-    @CircuitBreaker(name = "companyBreaker",
+    /*@CircuitBreaker(name = "companyBreaker",
+            fallbackMethod = "companyBreakerFallback")*/
+    @Retry(name = "companyBreaker",
             fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> findAll() {
         List<Job> jobs = jobRepository.findAll();
