@@ -10,6 +10,7 @@ import com.sasiri.jobapp.jobms.job.dto.JobDTO;
 import com.sasiri.jobapp.jobms.job.external.Company;
 import com.sasiri.jobapp.jobms.job.external.Review;
 import com.sasiri.jobapp.jobms.job.mapper.JobMapper;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,11 +41,17 @@ public class JobServiceImpl implements JobService {
     private ReviewClient reviewClient;
 
     @Override
+    @CircuitBreaker(name = "companyBreaker",
+            fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> findAll() {
         List<Job> jobs = jobRepository.findAll();
 
         return jobs.stream().map(this::convertToDto).collect(Collectors.toList());
 
+    }
+
+    public List<String> companyBreakerFallback(Exception e) {
+        return List.of("Dummy","Company Microservice is down");
     }
 
     private JobDTO convertToDto(Job job) {
