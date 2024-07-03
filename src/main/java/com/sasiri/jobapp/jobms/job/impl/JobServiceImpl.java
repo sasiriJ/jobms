@@ -11,6 +11,8 @@ import com.sasiri.jobapp.jobms.job.external.Company;
 import com.sasiri.jobapp.jobms.job.external.Review;
 import com.sasiri.jobapp.jobms.job.mapper.JobMapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,13 +42,18 @@ public class JobServiceImpl implements JobService {
 
     @Autowired
     private ReviewClient reviewClient;
+    @Autowired
+    private RateLimiterRegistry rateLimiterRegistry;
 
     @Override
     /*@CircuitBreaker(name = "companyBreaker",
             fallbackMethod = "companyBreakerFallback")*/
-    @Retry(name = "companyBreaker",
+    /*@Retry(name = "companyBreaker",
+            fallbackMethod = "companyBreakerFallback")*/
+    @RateLimiter(name = "companyBreaker",
             fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> findAll() {
+
         List<Job> jobs = jobRepository.findAll();
 
         return jobs.stream().map(this::convertToDto).collect(Collectors.toList());
