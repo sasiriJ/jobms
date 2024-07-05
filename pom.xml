@@ -115,6 +115,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <image>
+                        <builder>paketobuildpacks/builder:latest</builder>
+                        <env>
+                            <BP_CACHE_DIR>/tmp/paketo-cache</BP_CACHE_DIR>
+                        </env>
+                    </image>
+                </configuration>
             </plugin>
         </plugins>
     </build>
